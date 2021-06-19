@@ -1,4 +1,4 @@
 wifi_config = {
-    'ssid':'LdL',
-    'password':'LaBassePradelle1998'
+    'ssid':'...',
+    'password':'...'
 }
