@@ -1,3 +1,4 @@
+### You should update the wifiCredentials file ###
 import wifiCredentials
 import network
 import utime
@@ -31,7 +32,7 @@ def do_connect():
     ###AP MODE
     '''
 
-    ssid = 'LdL-GPS'
+    ssid = 'LdL-Atlantic'
     password = '12345678'
 
     ap = network.WLAN(network.AP_IF)
