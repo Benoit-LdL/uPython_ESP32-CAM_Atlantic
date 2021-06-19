@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>ESP32 Camera</title>
+    <meta name="robots" content="index,follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bootstrap.min.css" rel="stylesheet"> <!--https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css-->
+    <script type="text/javascript">     
+      function isNumber(evt) {
+              evt = (evt) ? evt : window.event;
+              var charCode = (evt.which) ? evt.which : evt.keyCode;
+              if ( (charCode > 31 && charCode < 48) || charCode > 57) {
+                  return false;
+              }
+              return true;
+          }
+      </script>
+  </head>
+  <body onload="updateForm()">
+    <div class="container content">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <img src='stream/d' onload='imageRefresh(this, 30);' style="max-width: 100%;">
+          <form id="uPyCam">
+            <section class="section-preview">
+              <div class="form-group">
+                <label for="formSize">Frame size</label>
+                <select class="selectpicker" id="formSize" style="width: 100%;">
+                  <option value="0">96X96</option>
+                  <option value="1">QQVGA</option>
+                  <option value="2">QCIF</option>
+                  <option value="3">HQVGA</option>
+                  <option value="4">240X240</option>
+                  <option value="5">QVGA</option>
+                  <option value="6">CIF</option>
+                  <option value="7">HVGA</option>
+                  <option value="8">VGA</option>
+                  <option value="9">SVGA</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="formQuality">Quality (5-high, 50-low):</label>
+                <input type="range" min="5" max="50" value="10" step="1" class="slider custom-range" id="formQuality" style="width: 100%;">
+              </div>
+                <div class="form-group">
+                  <label for="forvFlip">vFlip:</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="forvFlip" id="forvFlipR" value="vFlipR" checked>
+                    <label class="form-check-label" for="forvFlipR">Off</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="forvFlip" id="forvFlipL" value="vFlipL">
+                    <label class="form-check-label" for="forvFlipL">On</label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="forhFlip">hFlip:</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="forhFlip" id="forhFlipU" value="hFlipU" checked>
+                    <label class="form-check-label" for="forhFlipU">Off</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="forhFlip" id="forhFlipD" value="vFlipD">
+                    <label class="form-check-label" for="forhFlipD">On</label>
+                  </div>
+                </div>
+                <div class="form-check">
+                  <button class="btn btn-primary" type="button" onclick="submitForm()">Configure</button>
+                </div>
+                <hr>
+            </section>
+          </form>
+          <br>
+          <div>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('turnL')">Turn L</button>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('lights')">Lights</button>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('turnR')">Turn R</button>
+            
+            <br><br>
+            
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('bonnetL')">Bonnet L</button>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('forward')">Forward</button>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('bonnetR')">Bonnet R</button>
+            
+            <br><br>
+            
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('left')">Left</button>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('stop')">Stop</button>                            
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('right')">Right</button>
+            
+            <br><br>
+            
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('doorL')">Door L</button>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('backward')">Backward</button>
+            <button class="btn btn-primary" style="width:80px;" onclick="submitCar('doorR')">Door R</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script language="javascript"> 
+      var update_track = 0;
+      var update_input = 0;
+      var uPyCam = document.getElementById("uPyCam");
+
+      function imageRefresh(img, timeout) {
+        setTimeout(function() {
+        var d = new Date;
+        var http = img.src;
+        if (http.indexOf("/d") != -1) { http = http.split("/d")[0]; } 
+
+        img.src = http + '/d' + d.getTime();
+        }, timeout);
+      }
+
+      function updateForm() {
+          var xhttp = new XMLHttpRequest();
+
+          xhttp.open("GET", "upy", true);
+          xhttp.send();
+
+          xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200 
+          && (!update_input || this_update == update_input)) {
+            update_input = 0;
+            var obj = JSON.parse(this.response);
+
+            uPyCam.formQuality.value = obj.quality;
+            uPyCam.formSize.value = obj.framesize;
+
+            if (obj.vflip) {
+              uPyCam.forvFlipL.checked = true;
+              uPyCam.forvFlipR.checked = false;
+            }else{
+              uPyCam.forvFlipL.checked = false;
+              uPyCam.forvFlipR.checked = true;
+            }
+            if (obj.hflip) {
+              uPyCam.forhFlipU.checked = true;
+              uPyCam.forhFlipD.checked = false;
+            }else{
+              uPyCam.forhFlipU.checked = false;
+              uPyCam.forhFlipD.checked = true;
+            }
+
+
+          }
+        };
+      }
+
+      function submitForm() {
+        update_track++;
+
+        quality = uPyCam.formQuality.value;
+        vflip = uPyCam.forvFlipR.checked ? 1 : 0;
+        hflip = uPyCam.forhFlipU.checked ? 1 : 0;
+        framesize = uPyCam.formSize.value;
+
+        var this_update = update_track;
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200 
+          && (!update_input || this_update == update_input)) {
+            update_input = 0;
+          }
+        };
+          xhttp.open("GET", "upy/" + quality + "/" + vflip + "/" + hflip + "/" + framesize, true);
+          xhttp.send();
+      }
+
+      function submitCar(input) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "car/"+ input)
+        xhttp.send();
+      }
+
+    </script>    
+    
+  </body>
+</html>
+
