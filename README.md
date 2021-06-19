@@ -17,6 +17,20 @@ However I had problems programming the webserver in arduino (C++) so eventually 
 Just learned that you can run microPython on ESP boards, so I gave it a try and it works quite well!
 I used this [project](https://github.com/lemariva/uPyCam) from [Lemariva](https://github.com/lemariva) as a reference and built something custom.
 
+## Hardware
+
+* ESP32-CAM bought from ALiExpress
+* PCA9685 16-channel PWM Servo controller also bought from AliExpress
+* Cheap BEC/UBEC to give enough juice to the servos
+* 9g servos from AliExpress
+* Leds from AliExpress
+* Tevo Tarantula 3D Printer
+* Fillamentum PLA Extrafill Cobalt Blue
+
+## Software
+
+* I used [this](https://github.com/lemariva/micropython-camera-driver/tree/master/firmware) custom uPython fimrware by [lemariva](https://github.com/lemariva/) on my ESP32-CAM
+
 ## Functionality of project
 
 * Choice between AP and standard wifi mode
