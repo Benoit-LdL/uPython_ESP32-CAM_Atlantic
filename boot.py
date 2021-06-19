@@ -1,4 +1,4 @@
-import config
+import wifiCredentials
 import network
 import utime
 import ntptime
@@ -14,7 +14,7 @@ def do_connect():
     if not sta_if.isconnected():
         print('connecting to network...')
         sta_if.active(True)
-        sta_if.connect(config.wifi_config["ssid"], config.wifi_config["password"])
+        sta_if.connect(wifiCredentials.wifi_config["ssid"], wifiCredentials.wifi_config["password"])
         while not sta_if.isconnected() and \
             not timed_out:        
             if utime.time() - start >= 20:
